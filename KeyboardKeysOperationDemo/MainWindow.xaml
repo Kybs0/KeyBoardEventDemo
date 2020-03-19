@@ -1,10 +1,9 @@
-﻿<Window x:Class="KeyboardKeysOperationDemo.MainWindow"
+﻿<Window x:Class="KeyboardEventTool.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp30"
-        mc:Ignorable="d" x:Name="TheMainWindow"
+        mc:Ignorable="d" x:Name="TheMainWindow" Icon="icon.ico"
         Title="键盘发送/接收工具" Height="400" Width="600" PreviewKeyDown="MainWindow_OnPreviewKeyDown" PreviewKeyUp="MainWindow_OnPreviewKeyUp">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>

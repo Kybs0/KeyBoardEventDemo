@@ -26,7 +26,7 @@ using ComboBox = System.Windows.Controls.ComboBox;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 
-namespace KeyboardKeysOperationDemo
+namespace KeyboardEventTool
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
@@ -44,7 +44,7 @@ namespace KeyboardKeysOperationDemo
             var keysList = GetEnumDict(typeof(Keys));
             KeysList = keysList.OrderBy(i => i).ToList();
             KeyComboBox1.ItemsSource = KeysList;
-            KeyComboBox2.ItemsSource = KeysList; 
+            KeyComboBox2.ItemsSource = KeysList;
             KeyComboBox3.ItemsSource = KeysList;
             KeyComboBox1.SelectedValue = Keys.LControlKey.ToString();
             KeyComboBox2.SelectedValue = Keys.LMenu.ToString();
@@ -70,15 +70,15 @@ namespace KeyboardKeysOperationDemo
             SendKeysOperation(() =>
             {
                 //keybd_event((byte)Keys.LControlKey, 0, 0, 0);
-                //keybd_event((byte)Keys.LMenu, 0, 0, 0);
-                //keybd_event((byte)Keys.D1, 0, 0, 0);
-                //keybd_event((byte)Keys.D1, 0, 2, 0);
-                //keybd_event((byte)Keys.LMenu, 0, 2, 0);
+                //keybd_event((byte)Keys.LShiftKey, 0, 0, 0);
+                //keybd_event((byte)Keys.Divide, 0, 0, 0);
+                //keybd_event((byte)Keys.Divide, 0, 2, 0);
+                //keybd_event((byte)Keys.LShiftKey, 0, 2, 0);
                 //keybd_event((byte)Keys.LControlKey, 0, 2, 0);
                 try
                 {
-                    if (KeyComboBox1.Text is string keyString1 && Enum.TryParse<Keys>(keyString1,out var key1)
-                                                                           && key1!=Keys.None)
+                    if (KeyComboBox1.Text is string keyString1 && Enum.TryParse<Keys>(keyString1, out var key1)
+                                                                           && key1 != Keys.None)
                     {
                         keybd_event((byte)key1, 0, 0, 0);
                         if (KeyComboBox2.Text is string keyString2 && Enum.TryParse<Keys>(keyString2, out var key2)
@@ -115,7 +115,8 @@ namespace KeyboardKeysOperationDemo
                 if (string.IsNullOrEmpty(text))
                 {
                     action.Invoke();
-                }else if (double.TryParse(text,out var delayTime))
+                }
+                else if (double.TryParse(text, out var delayTime))
                 {
                     await Task.Delay(TimeSpan.FromSeconds(delayTime));
                     action.Invoke();
@@ -218,7 +219,7 @@ namespace KeyboardKeysOperationDemo
         {
             if (sender is ComboBox comboBox)
             {
-                var list = KeysList.FindAll(s => s.StartsWith(comboBox.Text.Trim(),true,CultureInfo.CurrentCulture));
+                var list = KeysList.FindAll(s => s.StartsWith(comboBox.Text.Trim(), true, CultureInfo.CurrentCulture));
                 comboBox.ItemsSource = list;
                 comboBox.IsDropDownOpen = true;
             }
