@@ -1,17 +1,64 @@
-﻿<Window x:Class="WpfApp30.MainWindow"
+﻿<Window x:Class="KeyboardKeysOperationDemo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp30"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" PreviewKeyDown="UIElement_OnPreviewKeyDown">
+        mc:Ignorable="d" x:Name="TheMainWindow"
+        Title="键盘发送/接收工具" Height="400" Width="600" PreviewKeyDown="MainWindow_OnPreviewKeyDown" PreviewKeyUp="MainWindow_OnPreviewKeyUp">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="120"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Button Content="发送键盘消息" Click="ButtonBase_OnClick" Height="30" HorizontalAlignment="Center" Padding="10,6" Visibility="Visible"></Button>
-        <TextBox x:Name="OutputTextBox" Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="6 0 0 0" IsReadOnly="True"/>
+        <Grid>
+            <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ComboBox x:Name="KeyComboBox1" Width="120" 
+                              IsEditable="True" IsTextSearchEnabled="False" PreviewKeyUp="KeyComboBox_OnPreviewKeyUp"/>
+                    <ComboBox x:Name="KeyComboBox2" Width="120" Margin="10 0 0 0"
+                              IsEditable="True" IsTextSearchEnabled="False"  PreviewKeyUp="KeyComboBox_OnPreviewKeyUp"/>
+                    <ComboBox x:Name="KeyComboBox3" Width="120" Margin="10 0 0 0"
+                              IsEditable="True" IsTextSearchEnabled="False" PreviewKeyUp="KeyComboBox_OnPreviewKeyUp"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
+                    <CheckBox x:Name="ShowTimerCheckBox" Content="延时发送" Click="ShowKeyDownCheckBox_OnClick" VerticalContentAlignment="Center"
+                              Margin="6 0 0 0" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="False"/>
+                    <StackPanel Orientation="Horizontal" x:Name="SendKeysTimePanel" Margin="4 0 0 0" VerticalAlignment="Center"
+                                Visibility="{Binding ElementName=ShowTimerCheckBox,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBox x:Name="SendKeysTimeTextBox" Text="0" PreviewTextInput="SendKeysTimeTextBox_OnPreviewTextInput"
+                                 InputMethod.IsInputMethodEnabled="False" VerticalAlignment="Center" Padding="4,0"></TextBox>
+                        <TextBlock Text="s" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
+                    <Button Content="发送键盘消息(User32)" Click="SendKeysByUser32_OnClick" Height="30"  Background="Transparent"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10,6" Visibility="Visible"></Button>
+                    <Button Content="发送键盘消息(WindowsInput)" Click="SendKeysByWindowsInput_OnClick" Height="30" Margin="20 0 0 0"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" Padding="10,6" Visibility="Collapsed" Background="Transparent"></Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <GroupBox  Grid.Row="1">
+            <GroupBox.HeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <TextBlock Text="键盘消息" VerticalAlignment="Center"></TextBlock>
+                        <CheckBox x:Name="ShowKeyDownCheckBox" Content="KeyDown" Click="ShowKeyDownCheckBox_OnClick"
+                                  Margin="6 0 0 0" VerticalAlignment="Center" IsChecked="True"/>
+                        <CheckBox x:Name="ShowKeyUpCheckBox" Content="KeyUp" Click="ShowKeyUpCheckBox_OnClick"
+                                  Margin="6 0 0 0" VerticalAlignment="Center" IsChecked="False"/>
+                    </StackPanel>
+                </DataTemplate>
+            </GroupBox.HeaderTemplate>
+            <Grid>
+                <TextBox x:Name="OutputTextBox" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="4 4" IsReadOnly="True"
+                         />
+                <Button x:Name="ClearButton" Click="ClearButton_OnClick" Content="清除" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" BorderBrush="Gainsboro" Margin="4"></Button>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>
