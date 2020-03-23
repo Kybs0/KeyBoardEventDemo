@@ -41,14 +41,14 @@ namespace KeyboardEventTool
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var keysList = GetEnumDict(typeof(Keys));
-            KeysList = keysList.OrderBy(i => i).ToList();
+            var keysList = GetEnumDict(typeof(Key));
+            KeysList = keysList.Distinct().ToList();
             KeyComboBox1.ItemsSource = KeysList;
             KeyComboBox2.ItemsSource = KeysList;
             KeyComboBox3.ItemsSource = KeysList;
-            KeyComboBox1.SelectedValue = Keys.LControlKey.ToString();
-            KeyComboBox2.SelectedValue = Keys.LMenu.ToString();
-            KeyComboBox3.SelectedValue = Keys.C.ToString();
+            KeyComboBox1.SelectedValue = Key.LeftCtrl.ToString();
+            KeyComboBox2.SelectedValue = Key.None.ToString();
+            KeyComboBox3.SelectedValue = Keys.None.ToString();
         }
 
         #region 发送键盘消息
@@ -69,37 +69,23 @@ namespace KeyboardEventTool
         {
             SendKeysOperation(() =>
             {
-                //keybd_event((byte)Keys.LControlKey, 0, 0, 0);
-                //keybd_event((byte)Keys.LShiftKey, 0, 0, 0);
-                //keybd_event((byte)Keys.Divide, 0, 0, 0);
-                //keybd_event((byte)Keys.Divide, 0, 2, 0);
-                //keybd_event((byte)Keys.LShiftKey, 0, 2, 0);
-                //keybd_event((byte)Keys.LControlKey, 0, 2, 0);
-                try
+                if (KeyComboBox1.Text is string wpfKeyString &&
+                    KeysTransferHelper.TryConvertToWinformKey(wpfKeyString, out var winformKey))
                 {
-                    if (KeyComboBox1.Text is string keyString1 && Enum.TryParse<Keys>(keyString1, out var key1)
-                                                                           && key1 != Keys.None)
+                    keybd_event((byte)winformKey, 0, 0, 0);
+                    if (KeyComboBox2.Text is string wpfKeyString2 &&
+                        KeysTransferHelper.TryConvertToWinformKey(wpfKeyString2, out var winformKey2))
                     {
-                        keybd_event((byte)key1, 0, 0, 0);
-                        if (KeyComboBox2.Text is string keyString2 && Enum.TryParse<Keys>(keyString2, out var key2)
-                                                                               && key2 != Keys.None)
+                        keybd_event((byte)winformKey2, 0, 0, 0);
+                        if (KeyComboBox3.Text is string wpfKeyString3 &&
+                            KeysTransferHelper.TryConvertToWinformKey(wpfKeyString3, out var winformKey3))
                         {
-                            keybd_event((byte)key2, 0, 0, 0);
-                            if (KeyComboBox3.Text is string keyString3 && Enum.TryParse<Keys>(keyString3, out var key3)
-                                                                                   && key3 != Keys.None)
-                            {
-                                keybd_event((byte)key3, 0, 0, 0);
-                                keybd_event((byte)key3, 0, 2, 0);
-                            }
-                            keybd_event((byte)key2, 0, 2, 0);
+                            keybd_event((byte)winformKey3, 0, 0, 0);
+                            keybd_event((byte)winformKey3, 0, 2, 0);
                         }
-                        keybd_event((byte)key1, 0, 2, 0);
+                        keybd_event((byte)winformKey2, 0, 2, 0);
                     }
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception);
-                    throw;
+                    keybd_event((byte)winformKey, 0, 2, 0);
                 }
             });
         }
@@ -111,8 +97,9 @@ namespace KeyboardEventTool
                 //默认发送给当前窗口
                 OutputTextBox.Focus();
 
+                //延迟发送
                 var text = SendKeysTimeTextBox.Text;
-                if (string.IsNullOrEmpty(text))
+                if (!(ShowTimerCheckBox.IsChecked ?? false) || string.IsNullOrEmpty(text))
                 {
                     action.Invoke();
                 }
@@ -213,16 +200,6 @@ namespace KeyboardEventTool
             }
 
             return list;
-        }
-
-        private void KeyComboBox_OnPreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            if (sender is ComboBox comboBox)
-            {
-                var list = KeysList.FindAll(s => s.StartsWith(comboBox.Text.Trim(), true, CultureInfo.CurrentCulture));
-                comboBox.ItemsSource = list;
-                comboBox.IsDropDownOpen = true;
-            }
         }
 
         #endregion
