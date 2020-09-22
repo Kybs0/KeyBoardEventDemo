@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:keyboardEventTool="clr-namespace:KeyboardEventTool"
         mc:Ignorable="d" x:Name="TheMainWindow" Icon="icon.ico"
-        Title="键盘发送/接收工具" Height="480" Width="720" PreviewKeyDown="MainWindow_OnPreviewKeyDown" PreviewKeyUp="MainWindow_OnPreviewKeyUp">
+        Title="键盘发送/接收工具" Height="480" Width="720">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <keyboardEventTool:KeyTextToVisibilityConverter x:Key="KeyTextToVisibilityConverter"/>

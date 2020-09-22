@@ -74,6 +74,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Hook\CustomKeyEventArgs.cs" />
+    <Compile Include="Hook\CustomKeyPressEventArgs.cs" />
+    <Compile Include="Hook\CustomMouseEventArgs.cs" />
+    <Compile Include="Hook\UserActivityHook.cs" />
     <Compile Include="KeyTextToVisibilityConverter.cs" />
     <Compile Include="KeysTransferHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">

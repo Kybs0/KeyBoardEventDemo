@@ -1,29 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WindowsInput;
 using WindowsInput.Native;
 using CheckBox = System.Windows.Controls.CheckBox;
-using ComboBox = System.Windows.Controls.ComboBox;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KeyboardEventTool
@@ -31,8 +18,9 @@ namespace KeyboardEventTool
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
+        private UserActivityHook _hook;
         public MainWindow()
         {
             InitializeComponent();
@@ -41,6 +29,7 @@ namespace KeyboardEventTool
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            Loaded -= MainWindow_Loaded;
             var keysList = GetEnumDict(typeof(Key));
             KeysList = keysList.Distinct().ToList();
             KeyComboBox1.ItemsSource = KeysList;
@@ -49,6 +38,10 @@ namespace KeyboardEventTool
             KeyComboBox1.SelectedValue = Key.LeftCtrl.ToString();
             KeyComboBox2.SelectedValue = Key.None.ToString();
             KeyComboBox3.SelectedValue = Keys.None.ToString();
+
+            _hook = new UserActivityHook(false, true);
+            _hook.KeyDown += _hook_KeyDown;
+            _hook.KeyUp += _hook_KeyUp;
         }
 
         #region 发送键盘消息
@@ -94,9 +87,6 @@ namespace KeyboardEventTool
         {
             try
             {
-                //默认发送给当前窗口
-                OutputTextBox.Focus();
-
                 //延迟发送
                 var text = SendKeysTimeTextBox.Text;
                 if (!(ShowTimerCheckBox.IsChecked ?? false) || string.IsNullOrEmpty(text))
@@ -124,29 +114,29 @@ namespace KeyboardEventTool
         {
             SendKeysOperation(() =>
             {
-                var ctrlAndAlt = new List<VirtualKeyCode>() { VirtualKeyCode.LCONTROL, VirtualKeyCode.LMENU };
+                var ctrlAndAlt = new List<VirtualKeyCode> { VirtualKeyCode.LCONTROL, VirtualKeyCode.LMENU };
                 _inputSimulator.Keyboard.ModifiedKeyStroke(ctrlAndAlt, VirtualKeyCode.MULTIPLY);
             });
         }
 
         #endregion
 
-        #region 监听键盘消息
+        #region 监听全局键盘消息
 
-        private void MainWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        private void _hook_KeyUp(object sender, CustomKeyEventArgs e)
         {
-            if (_showKeyDown)
+            if (_showKeyUp)
             {
-                OutputTextBox.Text += string.IsNullOrEmpty(OutputTextBox.Text) ? e.Key.ToString() : "\r\n" + e.Key.ToString();
+                OutputTextBox.Text += string.IsNullOrEmpty(OutputTextBox.Text) ? e.Key.ToString() : "\r\n" + e.Key;
                 OutputTextBox.SelectionStart = OutputTextBox.Text.Length + 1;
             }
         }
 
-        private void MainWindow_OnPreviewKeyUp(object sender, KeyEventArgs e)
+        private void _hook_KeyDown(object sender, CustomKeyEventArgs e)
         {
-            if (_showKeyUp)
+            if (_showKeyDown)
             {
-                OutputTextBox.Text += string.IsNullOrEmpty(OutputTextBox.Text) ? e.Key.ToString() : "\r\n" + e.Key.ToString();
+                OutputTextBox.Text += string.IsNullOrEmpty(OutputTextBox.Text) ? e.Key.ToString() : "\r\n" + e.Key;
                 OutputTextBox.SelectionStart = OutputTextBox.Text.Length + 1;
             }
         }
@@ -158,7 +148,7 @@ namespace KeyboardEventTool
                 _showKeyDown = checkBox.IsChecked ?? false;
             }
         }
-        private bool _showKeyUp = false;
+        private bool _showKeyUp;
         private void ShowKeyUpCheckBox_OnClick(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
