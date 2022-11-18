@@ -91,6 +91,7 @@ namespace KeyboardEventTool
                 var text = SendKeysTimeTextBox.Text;
                 if (!(ShowTimerCheckBox.IsChecked ?? false) || string.IsNullOrEmpty(text))
                 {
+                    await Task.Delay(TimeSpan.FromMilliseconds(10));
                     action.Invoke();
                 }
                 else if (double.TryParse(text, out var delayTime))
